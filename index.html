@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Information Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab-button:hover {
+            background-color: #f0f0f0;
+        }
+        .tab-button.active {
+            border-bottom: 3px solid #4285f4;
+            color: #4285f4;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="email"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .create-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .create-button:hover {
+            background-color: #3367d6;
+        }
+        .contributor {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .add-contributor {
+            background-color: #f5f5f5;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .add-contributor:hover {
+            background-color: #e9e9e9;
+        }
+        .name-parts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+            margin-top: 5px;
+        }
+        .checkbox-group {
+            margin: 5px 0;
+        }
+        .checkbox-group label {
+            display: inline;
+            font-weight: normal;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Document Meta Information Editor</h1>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="language">Language</button>
+            <button class="tab-button" data-tab="audience">Audience</button>
+            <button class="tab-button" data-tab="keywords">Keywords</button>
+            <button class="tab-button" data-tab="dates">Dates</button>
+            <button class="tab-button" data-tab="organization">Organization</button>
+            <button class="tab-button" data-tab="permissions">Permissions</button>
+            <button class="tab-button" data-tab="contributors">Contributors</button>
+        </div>
+        
+        <div id="language" class="tab-content active">
+            <div class="form-group">
+                <label for="lang">Language</label>
+                <select id="lang">
+                    <option value="">Select a language</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="audience" class="tab-content">
+            <div class="form-group">
+                <label>Audience (Select one or more)</label>
+                <div id="audience-checkboxes"></div>
+            </div>
+        </div>
+        
+        <div id="keywords" class="tab-content">
+            <div class="form-group">
+                <label for="keywords-input">Keywords (comma separated)</label>
+                <input type="text" id="keywords-input" placeholder="Enter keywords separated by commas">
+            </div>
+        </div>
+        
+        <div id="dates" class="tab-content">
+            <div class="form-group">
+                <label for="approvedOn">Approved On</label>
+                <input type="date" id="approvedOn">
+            </div>
+            <div class="form-group">
+                <label for="nextReview">Next Review</label>
+                <input type="date" id="nextReview">
+            </div>
+            <div class="form-group">
+                <label for="expiresOn">Expires On</label>
+                <input type="date" id="expiresOn">
+            </div>
+            <div class="form-group">
+                <label for="publishedOn">Published On</label>
+                <input type="date" id="publishedOn">
+            </div>
+        </div>
+        
+        <div id="organization" class="tab-content">
+            <div class="form-group">
+                <label for="businessUnit">Business Unit</label>
+                <select id="businessUnit">
+                    <option value="">Select a business unit</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select id="department">
+                    <option value="">Select a department</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="permissions" class="tab-content">
+            <div class="form-group">
+                <label for="copyrightStmt">Copyright Statement</label>
+                <textarea id="copyrightStmt" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="copyrightYear">Copyright Year</label>
+                <input type="number" id="copyrightYear">
+            </div>
+            <div class="form-group">
+                <label for="copyrightHolder">Copyright Holder</label>
+                <input type="text" id="copyrightHolder">
+            </div>
+            <div class="form-group">
+                <label for="copyrightLicense">Copyright License</label>
+                <input type="text" id="copyrightLicense">
+            </div>
+        </div>
+        
+        <div id="contributors" class="tab-content">
+            <div id="contributors-list"></div>
+            <div class="add-contributor" id="add-contributor">
+                + Add Contributor
+            </div>
+        </div>
+        
+        <button class="create-button" id="create-button">Create Document</button>
+    </div>
+
+    <script>
+        // Global variable to hold the meta data
+        let metaData = {
+            "valueChange$": {
+                "closed": false,
+                "currentObservers": null,
+                "observers": [],
+                "isStopped": false,
+                "hasError": false,
+                "thrownError": null
+            },
+            "dataType": null,
+            "value": [],
+            "oldValue": [],
+            "items": [
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": "string",
+                    "value": [],
+                    "oldValue": [],
+                    "items": [],
+                    "members": [],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "lang",
+                    "friendlyText": "Language",
+                    "type": "attrib",
+                    "possibleValues": ["en", "fr", "de", "es"],
+                    "readOnly": false,
+                    "category": "meta"
+                },
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": "string",
+                    "value": [],
+                    "oldValue": [],
+                    "items": [],
+                    "members": [],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "audience",
+                    "friendlyText": "Audience",
+                    "type": "attrib-multivalue",
+                    "possibleValues": ["Internal", "External", "Novice", "Expert"],
+                    "readOnly": false,
+                    "category": "meta"
+                },
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": null,
+                    "value": [],
+                    "oldValue": [],
+                    "items": [],
+                    "members": [],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "keywords",
+                    "friendlyText": "Keywords",
+                    "type": "attrib-multivalue",
+                    "possibleValues": null,
+                    "readOnly": false,
+                    "category": "meta"
+                },
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": null,
+                    "value": [],
+                    "oldValue": [],
+                    "items": [
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "date",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "approvedOn",
+                            "friendlyText": "Approved On",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "date",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "nextReview",
+                            "friendlyText": "Next Review",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "date",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "expiresOn",
+                            "friendlyText": "Expires On",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "date",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "publishedOn",
+                            "friendlyText": "Published On",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        }
+                    ],
+                    "members": [],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "dates",
+                    "friendlyText": "Dates",
+                    "type": "group",
+                    "category": "meta"
+                },
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": null,
+                    "value": [],
+                    "oldValue": [],
+                    "items": [
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "string",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "businessUnit",
+                            "friendlyText": "Business Unit",
+                            "type": "attrib",
+                            "possibleValues": ["Commercial", "Investment", "Retail", "Private"],
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "string",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "department",
+                            "friendlyText": "Department",
+                            "type": "attrib",
+                            "possibleValues": ["Research", "Underwriting"],
+                            "readOnly": false,
+                            "category": "meta"
+                        }
+                    ],
+                    "members": [],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "organization",
+                    "friendlyText": "Organization",
+                    "type": "group",
+                    "category": "meta"
+                },
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": null,
+                    "value": [],
+                    "oldValue": [],
+                    "items": [
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": null,
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "copyrightStmt",
+                            "friendlyText": "Copyright Statement",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": "integer",
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "copyrightYear",
+                            "friendlyText": "Copyright Year",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": null,
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "copyrightHolder",
+                            "friendlyText": "Copyright Holder",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        },
+                        {
+                            "valueChange$": {
+                                "closed": false,
+                                "currentObservers": null,
+                                "observers": [],
+                                "isStopped": false,
+                                "hasError": false,
+                                "thrownError": null
+                            },
+                            "dataType": null,
+                            "value": [],
+                            "oldValue": [],
+                            "items": [],
+                            "members": [],
+                            "disabled": false,
+                            "hidden": false,
+                            "mandatory": false,
+                            "component": null,
+                            "serializeValue": [],
+                            "oldSerializeValue": [],
+                            "params": null,
+                            "sourceValue": [],
+                            "defaultValue": [],
+                            "show": true,
+                            "disableHighlights": false,
+                            "additionalInfo": {},
+                            "name": "copyrightLicense",
+                            "friendlyText": "Copyright License",
+                            "type": "attrib",
+                            "possibleValues": null,
+                            "readOnly": false,
+                            "category": "meta"
+                        }
+                    ],
+                    "members": [],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "permissions",
+                    "friendlyText": "Permissions",
+                    "type": "group",
+                    "category": "meta"
+                },
+                {
+                    "valueChange$": {
+                        "closed": false,
+                        "currentObservers": null,
+                        "observers": [],
+                        "isStopped": false,
+                        "hasError": false,
+                        "thrownError": null
+                    },
+                    "dataType": null,
+                    "value": [],
+                    "oldValue": [],
+                    "items": [],
+                    "members": [
+                        {
+                            "items": [
+                                {
+                                    "valueChange$": {
+                                        "closed": false,
+                                        "currentObservers": null,
+                                        "observers": [],
+                                        "isStopped": false,
+                                        "hasError": false,
+                                        "thrownError": null
+                                    },
+                                    "dataType": "string",
+                                    "value": [],
+                                    "oldValue": [],
+                                    "items": [],
+                                    "members": [],
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "mandatory": false,
+                                    "component": null,
+                                    "serializeValue": [],
+                                    "oldSerializeValue": [],
+                                    "params": null,
+                                    "sourceValue": [],
+                                    "defaultValue": [],
+                                    "show": true,
+                                    "disableHighlights": false,
+                                    "additionalInfo": {},
+                                    "name": "role",
+                                    "friendlyText": "Role",
+                                    "type": "attrib",
+                                    "possibleValues": [
+                                        "Content Author",
+                                        "SME",
+                                        "Line of Business Owner",
+                                        "Production Manager",
+                                        "Content Leader",
+                                        "Designer",
+                                        "Content Architect"
+                                    ],
+                                    "readOnly": false,
+                                    "category": "meta"
+                                },
+                                {
+                                    "valueChange$": {
+                                        "closed": false,
+                                        "currentObservers": null,
+                                        "observers": [],
+                                        "isStopped": false,
+                                        "hasError": false,
+                                        "thrownError": null
+                                    },
+                                    "dataType": null,
+                                    "value": [],
+                                    "oldValue": [],
+                                    "items": [],
+                                    "members": [],
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "mandatory": false,
+                                    "component": null,
+                                    "serializeValue": [],
+                                    "oldSerializeValue": [],
+                                    "params": null,
+                                    "sourceValue": [],
+                                    "defaultValue": [],
+                                    "show": true,
+                                    "disableHighlights": false,
+                                    "additionalInfo": {},
+                                    "name": "email",
+                                    "friendlyText": "Email Address",
+                                    "type": "attrib",
+                                    "possibleValues": null,
+                                    "readOnly": false,
+                                    "category": "meta"
+                                },
+                                {
+                                    "valueChange$": {
+                                        "closed": false,
+                                        "currentObservers": null,
+                                        "observers": [],
+                                        "isStopped": false,
+                                        "hasError": false,
+                                        "thrownError": null
+                                    },
+                                    "dataType": null,
+                                    "value": [],
+                                    "oldValue": [],
+                                    "items": [
+                                        {
+                                            "valueChange$": {
+                                                "closed": false,
+                                                "currentObservers": null,
+                                                "observers": [],
+                                                "isStopped": false,
+                                                "hasError": false,
+                                                "thrownError": null
+                                            },
+                                            "dataType": "string",
+                                            "value": [],
+                                            "oldValue": [],
+                                            "items": [],
+                                            "members": [],
+                                            "disabled": false,
+                                            "hidden": false,
+                                            "mandatory": false,
+                                            "component": null,
+                                            "serializeValue": [],
+                                            "oldSerializeValue": [],
+                                            "params": null,
+                                            "sourceValue": [],
+                                            "defaultValue": [],
+                                            "show": true,
+                                            "disableHighlights": false,
+                                            "additionalInfo": {},
+                                            "name": "prefix",
+                                            "friendlyText": "Prefix",
+                                            "type": "attrib",
+                                            "possibleValues": [
+                                                "Ms",
+                                                "Miss",
+                                                "Mrs",
+                                                "Mr",
+                                                "Rev",
+                                                "Dr",
+                                                "Prof"
+                                            ],
+                                            "readOnly": false,
+                                            "category": "meta"
+                                        },
+                                        {
+                                            "valueChange$": {
+                                                "closed": false,
+                                                "currentObservers": null,
+                                                "observers": [],
+                                                "isStopped": false,
+                                                "hasError": false,
+                                                "thrownError": null
+                                            },
+                                            "dataType": null,
+                                            "value": [],
+                                            "oldValue": [],
+                                            "items": [],
+                                            "members": [],
+                                            "disabled": false,
+                                            "hidden": false,
+                                            "mandatory": false,
+                                            "component": null,
+                                            "serializeValue": [],
+                                            "oldSerializeValue": [],
+                                            "params": null,
+                                            "sourceValue": [],
+                                            "defaultValue": [],
+                                            "show": true,
+                                            "disableHighlights": false,
+                                            "additionalInfo": {},
+                                            "name": "givenNames",
+                                            "friendlyText": "Given Name",
+                                            "type": "attrib",
+                                            "possibleValues": null,
+                                            "readOnly": false,
+                                            "category": "meta"
+                                        },
+                                        {
+                                            "valueChange$": {
+                                                "closed": false,
+                                                "currentObservers": null,
+                                                "observers": [],
+                                                "isStopped": false,
+                                                "hasError": false,
+                                                "thrownError": null
+                                            },
+                                            "dataType": null,
+                                            "value": [],
+                                            "oldValue": [],
+                                            "items": [],
+                                            "members": [],
+                                            "disabled": false,
+                                            "hidden": false,
+                                            "mandatory": false,
+                                            "component": null,
+                                            "serializeValue": [],
+                                            "oldSerializeValue": [],
+                                            "params": null,
+                                            "sourceValue": [],
+                                            "defaultValue": [],
+                                            "show": true,
+                                            "disableHighlights": false,
+                                            "additionalInfo": {},
+                                            "name": "surName",
+                                            "friendlyText": "Last Name",
+                                            "type": "attrib",
+                                            "possibleValues": null,
+                                            "readOnly": false,
+                                            "category": "meta"
+                                        },
+                                        {
+                                            "valueChange$": {
+                                                "closed": false,
+                                                "currentObservers": null,
+                                                "observers": [],
+                                                "isStopped": false,
+                                                "hasError": false,
+                                                "thrownError": null
+                                            },
+                                            "dataType": null,
+                                            "value": [],
+                                            "oldValue": [],
+                                            "items": [],
+                                            "members": [],
+                                            "disabled": false,
+                                            "hidden": false,
+                                            "mandatory": false,
+                                            "component": null,
+                                            "serializeValue": [],
+                                            "oldSerializeValue": [],
+                                            "params": null,
+                                            "sourceValue": [],
+                                            "defaultValue": [],
+                                            "show": true,
+                                            "disableHighlights": false,
+                                            "additionalInfo": {},
+                                            "name": "suffix",
+                                            "friendlyText": "Suffix",
+                                            "type": "attrib",
+                                            "possibleValues": null,
+                                            "readOnly": false,
+                                            "category": "meta"
+                                        }
+                                    ],
+                                    "members": [],
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "mandatory": false,
+                                    "component": null,
+                                    "serializeValue": [],
+                                    "oldSerializeValue": [],
+                                    "params": null,
+                                    "sourceValue": [],
+                                    "defaultValue": [],
+                                    "show": true,
+                                    "disableHighlights": false,
+                                    "additionalInfo": {},
+                                    "name": "contribName",
+                                    "friendlyText": "Contributor Name",
+                                    "type": "group",
+                                    "category": "meta"
+                                }
+                            ],
+                            "name": "contrib",
+                            "friendlyText": "contrib"
+                        }
+                    ],
+                    "disabled": false,
+                    "hidden": false,
+                    "mandatory": false,
+                    "component": null,
+                    "serializeValue": [],
+                    "oldSerializeValue": [],
+                    "params": null,
+                    "sourceValue": [],
+                    "defaultValue": [],
+                    "show": true,
+                    "disableHighlights": false,
+                    "additionalInfo": {},
+                    "name": "contribs",
+                    "friendlyText": "Contributors",
+                    "type": "collection",
+                    "category": "meta"
+                }
+            ],
+            "members": [],
+            "disabled": false,
+            "hidden": false,
+            "mandatory": false,
+            "component": null,
+            "serializeValue": [],
+            "oldSerializeValue": [],
+            "params": null,
+            "sourceValue": [],
+            "defaultValue": [],
+            "show": true,
+            "disableHighlights": false,
+            "additionalInfo": {},
+            "type": "meta"
+        };
+
+        // Initialize the form when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+            setupTabs();
+            
+            // Set up create button handler
+            document.getElementById('create-button').addEventListener('click', function() {
+                updateMetaData();
+                
+                // Here you would typically send the data back to the plugin
+                console.log('Updated meta data:', metaData);
+                alert('Document creation process started with the following data:\n' + JSON.stringify(metaData, null, 2));
+                
+                // If running in an iframe, send to parent
+                if (window.parent) {
+                    window.parent.postMessage({
+                        action: 'updateMetaInfo',
+                        metaInfo: metaData
+                    }, '*');
+                }
+            });
+        });
+
+        // Initialize the form with the meta data
+        function initializeForm() {
+            // Language tab
+            const langItem = metaData.items.find(item => item.name === 'lang');
+            if (langItem) {
+                const langSelect = document.getElementById('lang');
+                langItem.possibleValues.forEach(lang => {
+                    const option = document.createElement('option');
+                    option.value = lang;
+                    option.textContent = lang;
+                    if (langItem.value[0] === lang) {
+                        option.selected = true;
+                    }
+                    langSelect.appendChild(option);
+                });
+            }
+
+            // Audience tab (multi-value)
+            const audienceItem = metaData.items.find(item => item.name === 'audience');
+            if (audienceItem) {
+                const container = document.getElementById('audience-checkboxes');
+                audienceItem.possibleValues.forEach(audience => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-group';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `audience-${audience}`;
+                    checkbox.value = audience;
+                    if (audienceItem.value.includes(audience)) {
+                        checkbox.checked = true;
+                    }
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `audience-${audience}`;
+                    label.textContent = audience;
+                    
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    container.appendChild(div);
+                });
+            }
+
+            // Keywords tab
+            const keywordsItem = metaData.items.find(item => item.name === 'keywords');
+            if (keywordsItem) {
+                document.getElementById('keywords-input').value = keywordsItem.value.join(', ');
+            }
+
+            // Dates tab
+            const datesItem = metaData.items.find(item => item.name === 'dates');
+            if (datesItem) {
+                datesItem.items.forEach(dateField => {
+                    const input = document.getElementById(dateField.name);
+                    if (input && dateField.value[0]) {
+                        input.value = dateField.value[0];
+                    }
+                });
+            }
+
+            // Organization tab
+            const orgItem = metaData.items.find(item => item.name === 'organization');
+            if (orgItem) {
+                orgItem.items.forEach(orgField => {
+                    const select = document.getElementById(orgField.name);
+                    if (select) {
+                        orgField.possibleValues.forEach(value => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = value;
+                            if (orgField.value[0] === value) {
+                                option.selected = true;
+                            }
+                            select.appendChild(option);
+                        });
+                    }
+                });
+            }
+
+            // Permissions tab
+            const permissionsItem = metaData.items.find(item => item.name === 'permissions');
+            if (permissionsItem) {
+                permissionsItem.items.forEach(permField => {
+                    const input = document.getElementById(permField.name);
+                    if (input) {
+                        input.value = permField.value[0] || '';
+                    }
+                });
+            }
+
+            // Contributors tab
+            const contribsItem = metaData.items.find(item => item.name === 'contribs');
+            if (contribsItem && contribsItem.members) {
+                renderContributors(contribsItem.members);
+            }
+        }
+
+        // Set up tab switching
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Render contributors list
+        function renderContributors(contributors) {
+            const container = document.getElementById('contributors-list');
+            container.innerHTML = '';
+            
+            contributors.forEach((contributor, index) => {
+                const contribDiv = document.createElement('div');
+                contribDiv.className = 'contributor';
+                contribDiv.innerHTML = `
+                    <h3>Contributor #${index + 1}</h3>
+                    <div class="form-group">
+                        <label for="role-${index}">Role</label>
+                        <select id="role-${index}" class="contrib-role">
+                            <option value="">Select a role</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="email-${index}">Email Address</label>
+                        <input type="email" id="email-${index}" class="contrib-email">
+                    </div>
+                    <div class="form-group">
+                        <label>Contributor Name</label>
+                        <div class="name-parts">
+                            <div>
+                                <label for="prefix-${index}">Prefix</label>
+                                <select id="prefix-${index}" class="name-prefix">
+                                    <option value="">Select prefix</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="givenNames-${index}">Given Name</label>
+                                <input type="text" id="givenNames-${index}" class="name-given">
+                            </div>
+                            <div>
+                                <label for="surName-${index}">Last Name</label>
+                                <input type="text" id="surName-${index}" class="name-last">
+                            </div>
+                            <div>
+                                <label for="suffix-${index}">Suffix</label>
+                                <input type="text" id="suffix-${index}" class="name-suffix">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="remove-contributor" data-index="${index}">Remove Contributor</button>
+                `;
+                
+                // Fill role dropdown
+                const roleSelect = contribDiv.querySelector(`.contrib-role`);
+                const roleItem = contributor.items.find(item => item.name === 'role');
+                if (roleItem) {
+                    roleItem.possibleValues.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role;
+                        option.textContent = role;
+                        if (roleItem.value[0] === role) {
+                            option.selected = true;
+                        }
+                        roleSelect.appendChild(option);
+                    });
+                }
+                
+                // Fill email
+                const emailItem = contributor.items.find(item => item.name === 'email');
+                if (emailItem) {
+                    contribDiv.querySelector(`.contrib-email`).value = emailItem.value[0] || '';
+                }
+                
+                // Fill name parts
+                const nameItem = contributor.items.find(item => item.name === 'contribName');
+                if (nameItem) {
+                    nameItem.items.forEach(namePart => {
+                        if (namePart.name === 'prefix') {
+                            const prefixSelect = contribDiv.querySelector(`.name-prefix`);
+                            namePart.possibleValues.forEach(prefix => {
+                                const option = document.createElement('option');
+                                option.value = prefix;
+                                option.textContent = prefix;
+                                if (namePart.value[0] === prefix) {
+                                    option.selected = true;
+                                }
+                                prefixSelect.appendChild(option);
+                            });
+                        } else {
+                            const input = contribDiv.querySelector(`.name-${namePart.name.toLowerCase()}`);
+                            if (input) {
+                                input.value = namePart.value[0] || '';
+                            }
+                        }
+                    });
+                }
+                
+                container.appendChild(contribDiv);
+            });
+            
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-contributor').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    metaData.items.find(item => item.name === 'contribs').members.splice(index, 1);
+                    renderContributors(metaData.items.find(item => item.name === 'contribs').members);
+                });
+            });
+            
+            // Add contributor button
+            document.getElementById('add-contributor').addEventListener('click', function() {
+                const contribsItem = metaData.items.find(item => item.name === 'contribs');
+                if (!contribsItem.members) contribsItem.members = [];
+                
+                const newContributor = {
+                    items: [
+                        {
+                            name: 'role',
+                            value: [],
+                            possibleValues: [
+                                "Content Author", "SME", "Line of Business Owner", 
+                                "Production Manager", "Content Leader", "Designer", "Content Architect"
+                            ],
+                            dataType: "string",
+                            friendlyText: "Role"
+                        },
+                        {
+                            name: 'email',
+                            value: [],
+                            dataType: null,
+                            friendlyText: "Email Address"
+                        },
+                        {
+                            name: 'contribName',
+                            items: [
+                                {
+                                    name: 'prefix',
+                                    value: [],
+                                    possibleValues: ["Ms", "Miss", "Mrs", "Mr", "Rev", "Dr", "Prof"],
+                                    dataType: "string",
+                                    friendlyText: "Prefix"
+                                },
+                                {
+                                    name: 'givenNames',
+                                    value: [],
+                                    dataType: null,
+                                    friendlyText: "Given Name"
+                                },
+                                {
+                                    name: 'surName',
+                                    value: [],
+                                    dataType: null,
+                                    friendlyText: "Last Name"
+                                },
+                                {
+                                    name: 'suffix',
+                                    value: [],
+                                    dataType: null,
+                                    friendlyText: "Suffix"
+                                }
+                            ],
+                            type: "group",
+                            friendlyText: "Contributor Name"
+                        }
+                    ],
+                    name: "contrib",
+                    friendlyText: "contrib"
+                };
+                
+                contribsItem.members.push(newContributor);
+                renderContributors(contribsItem.members);
+            });
+        }
+
+        // Update meta data with form values
+        function updateMetaData() {
+            // Language
+            const langItem = metaData.items.find(item => item.name === 'lang');
+            if (langItem) {
+                const langSelect = document.getElementById('lang');
+                langItem.value = langSelect.value ? [langSelect.value] : [];
+            }
+            
+            // Audience (multi-value)
+            const audienceItem = metaData.items.find(item => item.name === 'audience');
+            if (audienceItem) {
+                const selectedAudiences = [];
+                document.querySelectorAll('#audience-checkboxes input[type="checkbox"]:checked').forEach(checkbox => {
+                    selectedAudiences.push(checkbox.value);
+                });
+                audienceItem.value = selectedAudiences;
+            }
+            
+            // Keywords
+            const keywordsItem = metaData.items.find(item => item.name === 'keywords');
+            if (keywordsItem) {
+                const keywordsInput = document.getElementById('keywords-input');
+                keywordsItem.value = keywordsInput.value 
+                    ? keywordsInput.value.split(',').map(k => k.trim()).filter(k => k)
+                    : [];
+            }
+            
+            // Dates
+            const datesItem = metaData.items.find(item => item.name === 'dates');
+            if (datesItem) {
+                datesItem.items.forEach(dateField => {
+                    const input = document.getElementById(dateField.name);
+                    dateField.value = input.value ? [input.value] : [];
+                });
+            }
+            
+            // Organization
+            const orgItem = metaData.items.find(item => item.name === 'organization');
+            if (orgItem) {
+                orgItem.items.forEach(orgField => {
+                    const select = document.getElementById(orgField.name);
+                    orgField.value = select.value ? [select.value] : [];
+                });
+            }
+            
+            // Permissions
+            const permissionsItem = metaData.items.find(item => item.name === 'permissions');
+            if (permissionsItem) {
+                permissionsItem.items.forEach(permField => {
+                    const input = document.getElementById(permField.name);
+                    permField.value = input.value ? [input.value] : [];
+                });
+            }
+            
+            // Contributors
+            const contribsItem = metaData.items.find(item => item.name === 'contribs');
+            if (contribsItem && contribsItem.members) {
+                contribsItem.members.forEach((contributor, index) => {
+                    // Role
+                    const roleSelect = document.getElementById(`role-${index}`);
+                    const roleItem = contributor.items.find(item => item.name === 'role');
+                    if (roleItem) {
+                        roleItem.value = roleSelect.value ? [roleSelect.value] : [];
+                    }
+                    
+                    // Email
+                    const emailInput = document.getElementById(`email-${index}`);
+                    const emailItem = contributor.items.find(item => item.name === 'email');
+                    if (emailItem) {
+                        emailItem.value = emailInput.value ? [emailInput.value] : [];
+                    }
+                    
+                    // Name parts
+                    const nameItem = contributor.items.find(item => item.name === 'contribName');
+                    if (nameItem) {
+                        nameItem.items.forEach(namePart => {
+                            let value;
+                            if (namePart.name === 'prefix') {
+                                const select = document.getElementById(`prefix-${index}`);
+                                value = select.value;
+                            } else {
+                                const input = document.getElementById(`${namePart.name}-${index}`);
+                                value = input.value;
+                            }
+                            namePart.value = value ? [value] : [];
+                        });
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
