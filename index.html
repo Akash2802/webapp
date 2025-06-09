@@ -1080,14 +1080,11 @@
         type: "meta",
       };
 
-      const PLUGIN_ORIGIN =
-        window.location.hostname === "localhost"
-          ? "http://localhost:3000"
-          : "https://akash2802.github.io";
+      const TARGET_ORIGIN = "https://akash2802.github.io";
 
       // Listen for initialization data from parent
       window.addEventListener("message", function (event) {
-        if (event.origin !== PLUGIN_ORIGIN) return;
+        if (event.origin !== TARGET_ORIGIN) return;
 
         if (event.data?.type === "INIT_META") {
           console.log("Received initialization data", event.data);
@@ -1103,7 +1100,7 @@
             {
               type: "IFRAME_READY",
             },
-            PLUGIN_ORIGIN
+            "https://akash2802.github.io"
           );
         }
         initializeForm();
@@ -1129,9 +1126,8 @@
                   type: "updateMetaInfo",
                   payload: metaData,
                 },
-                PLUGIN_ORIGIN
+                "*"
               );
-              btn.textContent = "Sent!";
             }
           });
       });
