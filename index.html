@@ -1095,7 +1095,7 @@
       });
       // Initialize the form when the page loads
       document.addEventListener("DOMContentLoaded", function () {
-        if (window.parent !== window) {
+        if (window.parent === window) {
           window.parent.postMessage(
             {
               type: "IFRAME_READY",
