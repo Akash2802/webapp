@@ -1126,6 +1126,12 @@
                 "*"
               );
             }
+               window.parent.postMessage(
+              {
+                type: "CLOSE_DIALOG",
+              },
+              "*"
+            );
           });
       });
 
