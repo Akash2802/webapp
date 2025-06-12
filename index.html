@@ -1114,10 +1114,7 @@
 
             // Here you would typically send the data back to the plugin
             console.log("Updated meta data:", metaData);
-            alert(
-              "Document creation process started with the following data:\n" +
-                JSON.stringify(metaData, null, 2)
-            );
+         
 
             // If running in an iframe, send to parent
             if (window.parent) {
