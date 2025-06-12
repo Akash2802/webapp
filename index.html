@@ -1127,11 +1127,11 @@
               );
             }
                window.parent.postMessage(
-              {
-                type: "CLOSE_DIALOG",
-              },
-              "*"
-            );
+        {
+          type: "CLOSE_DIALOG", // Make sure parent listens for this type
+        },
+        "*"
+      );
           });
       });
 
