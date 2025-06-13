@@ -1107,32 +1107,27 @@
         setupTabs();
 
         // Set up create button handler
-        document
-          .getElementById("create-button")
-          .addEventListener("click", function () {
-            updateMetaData();
+       document.getElementById("create-button").addEventListener("click", async function() {
+    try {
+        updateMetaData();
+        
+        // 1. Send metadata first
+        window.parent.postMessage({
+            type: "updateMetaInfo",
+            payload: metaData
+        }, "*");
 
-            // Here you would typically send the data back to the plugin
-            console.log("Updated meta data:", metaData);
-         
-
-            // If running in an iframe, send to parent
-            if (window.parent) {
-              window.parent.postMessage(
-                {
-                  type: "updateMetaInfo",
-                  payload: metaData,
-                },
-                "*"
-              );
-            }
-               window.parent.postMessage(
-        {
-          type: "CLOSE_DIALOG", // Make sure parent listens for this type
-        },
-        "*"
-      );
-          });
+        // 2. Wait a brief moment before closing
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // 3. Then send close command
+        window.parent.postMessage({
+            type: "CLOSE_DIALOG"
+        }, "*");
+    } catch (error) {
+        console.error("Error:", error);
+    }
+});
       });
 
       // Initialize the form with the meta data
