@@ -1108,10 +1108,7 @@
 
         // Set up create button handler
       // Add this constant at the top of your webapp script
-const EVENTS = {
-    CLOSE_DIALOG: 'CLOSE_DIALOG',
-    UPDATE_META: 'updateMetaInfo'
-};
+
 
 document.getElementById("create-button").addEventListener("click", function() {
     try {
@@ -1119,21 +1116,12 @@ document.getElementById("create-button").addEventListener("click", function() {
         
         // 1. First send the metadata update
         window.parent.postMessage({
-            type: EVENTS.UPDATE_META,
+            type: "updateMetaInfo",
             payload: metaData
         }, "*");
         
         // 2. Then send the close dialog command
-        const closeDialogEvent = {
-            eventType: EVENTS.CLOSE_DIALOG
-        };
-        window.parent.postMessage(closeDialogEvent, "*");
         
-        console.log("Close dialog message sent");
-        
-    } catch (error) {
-        console.error("Error:", error);
-    }
 });
       });
 
