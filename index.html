@@ -1080,50 +1080,45 @@
         type: "meta",
       };
 
-      const TARGET_ORIGIN = "https://akash2802.github.io";
+    const TARGET_ORIGIN = "https://akash2802.github.io";
 
-      // Listen for initialization data from parent
-      window.addEventListener("message", function (event) {
-        if (event.origin !== TARGET_ORIGIN) return;
+let metaData = {};
 
-        if (event.data?.type === "INIT_META") {
-          console.log("Received initialization data", event.data);
-          metaData = event.data.payload;
-          initializeForm();
-          setupTabs();
-        }
-      });
-      // Initialize the form when the page loads
-      document.addEventListener("DOMContentLoaded", function () {
-        if (window.parent !== window) {
-          window.parent.postMessage(
-            {
-              type: "IFRAME_READY",
-            },
-            "https://akash2802.github.io"
-          );
-        }
-        initializeForm();
-        setupTabs();
+window.addEventListener("message", function (event) {
+  if (event.origin !== TARGET_ORIGIN && event.origin !== window.origin) return;
 
-        // Set up create button handler
-      // Add this constant at the top of your webapp script
-
-
-document.getElementById("create-button").addEventListener("click", function() {
-    try {
-        updateMetaData();
-        
-        // 1. First send the metadata update
-        window.parent.postMessage({
-            type: "updateMetaInfo",
-            payload: metaData
-        }, "*");
-        
-        // 2. Then send the close dialog command
-        
+  if (event.data?.type === "INIT_META") {
+    console.log("Received INIT_META:", event.data);
+    metaData = event.data.payload;
+    initializeForm();
+    setupTabs();
+  }
 });
-      });
+
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: "IFRAME_READY" }, TARGET_ORIGIN);
+  }
+
+  initializeForm();
+  setupTabs();
+
+  const createBtn = document.getElementById("create-button");
+  if (createBtn) {
+    createBtn.addEventListener("click", function () {
+      updateMetaData(); // assumes this updates `metaData`
+
+      window.parent.postMessage({
+        type: "updateMetaInfo",
+        payload: metaData
+      }, TARGET_ORIGIN);
+
+      console.log("Sent updateMetaInfo to parent");
+    });
+  } else {
+    console.warn("Create button not found");
+  }
+});
 
       // Initialize the form with the meta data
       function initializeForm() {
