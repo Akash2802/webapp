@@ -1080,45 +1080,49 @@
         type: "meta",
       };
 
-    const TARGET_ORIGIN = "https://akash2802.github.io";
-
+   const TARGET_ORIGIN = "https://akash2802.github.io";
 let metaData = {};
 
+// ✅ Listen for INIT_META from parent
 window.addEventListener("message", function (event) {
-  if (event.origin !== TARGET_ORIGIN && event.origin !== window.origin) return;
-
+  // Allow INIT_META from any origin
   if (event.data?.type === "INIT_META") {
-    console.log("Received INIT_META:", event.data);
+    console.log("✅ Received INIT_META:", event.data);
     metaData = event.data.payload;
+
+    // Initialize form with incoming metadata
     initializeForm();
     setupTabs();
   }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  // ✅ Tell parent we are ready
   if (window.parent !== window) {
-    window.parent.postMessage({ type: "IFRAME_READY" }, TARGET_ORIGIN);
+    window.parent.postMessage({ type: "IFRAME_READY" }, "*");
   }
 
   initializeForm();
   setupTabs();
 
+  // ✅ Setup create button to post back updated metadata
   const createBtn = document.getElementById("create-button");
   if (createBtn) {
     createBtn.addEventListener("click", function () {
       updateMetaData(); // assumes this updates `metaData`
 
+      console.log("📤 Sending updateMetaInfo:", metaData);
+
       window.parent.postMessage({
         type: "updateMetaInfo",
         payload: metaData
-      }, TARGET_ORIGIN);
-
-      console.log("Sent updateMetaInfo to parent");
+      }, "*");
     });
   } else {
-    console.warn("Create button not found");
+    console.warn("❌ Create button not found");
   }
 });
+
 
       // Initialize the form with the meta data
       function initializeForm() {
