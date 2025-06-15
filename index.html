@@ -1080,49 +1080,40 @@
         type: "meta",
       };
 
-   const TARGET_ORIGIN = "https://akash2802.github.io";
-let metaData = {};
+      let metaData = {};
+      const TARGET_ORIGIN = "https://akash2802.github.io";
 
-// ✅ Listen for INIT_META from parent
-window.addEventListener("message", function (event) {
-  // Allow INIT_META from any origin
-  if (event.data?.type === "INIT_META") {
-    console.log("✅ Received INIT_META:", event.data);
-    metaData = event.data.payload;
+      // Listen for INIT_META from parent
+      window.addEventListener("message", function (event) {
+        if (event.origin !== TARGET_ORIGIN) return;
+        
+        if (event.data?.type === "INIT_META") {
+          console.log("✅ Received INIT_META:", event.data);
+          metaData = event.data.payload;
+          initializeForm();
+          setupTabs();
+        }
+      });
 
-    // Initialize form with incoming metadata
-    initializeForm();
-    setupTabs();
-  }
-});
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tell parent we are ready
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: "IFRAME_READY" }, TARGET_ORIGIN);
+        }
 
-document.addEventListener("DOMContentLoaded", function () {
-  // ✅ Tell parent we are ready
-  if (window.parent !== window) {
-    window.parent.postMessage({ type: "IFRAME_READY" }, "*");
-  }
-
-  initializeForm();
-  setupTabs();
-
-  // ✅ Setup create button to post back updated metadata
-  const createBtn = document.getElementById("create-button");
-  if (createBtn) {
-    createBtn.addEventListener("click", function () {
-      updateMetaData(); // assumes this updates `metaData`
-
-      console.log("📤 Sending updateMetaInfo:", metaData);
-
-      window.parent.postMessage({
-        type: "updateMetaInfo",
-        payload: metaData
-      }, "*");
-    });
-  } else {
-    console.warn("❌ Create button not found");
-  }
-});
-
+        // Setup create button
+        const createBtn = document.getElementById("create-button");
+        if (createBtn) {
+          createBtn.addEventListener("click", function () {
+            updateMetaData();
+            console.log("📤 Sending updateMetaInfo:", metaData);
+            window.parent.postMessage({
+              type: "updateMetaInfo",
+              payload: metaData
+            }, TARGET_ORIGIN);
+          });
+        }
+      });
 
       // Initialize the form with the meta data
       function initializeForm() {
