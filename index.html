@@ -1080,39 +1080,59 @@
         type: "meta",
       };
 
-    
       const TARGET_ORIGIN = "https://akash2802.github.io";
 
-      // Listen for INIT_META from parent
+      // Listen for initialization data from parent
       window.addEventListener("message", function (event) {
         if (event.origin !== TARGET_ORIGIN) return;
-        
+
         if (event.data?.type === "INIT_META") {
-          console.log("✅ Received INIT_META:", event.data);
+          console.log("Received initialization data", event.data);
           metaData = event.data.payload;
           initializeForm();
           setupTabs();
         }
       });
-
+      // Initialize the form when the page loads
       document.addEventListener("DOMContentLoaded", function () {
-        // Tell parent we are ready
         if (window.parent !== window) {
-          window.parent.postMessage({ type: "IFRAME_READY" }, TARGET_ORIGIN);
+          window.parent.postMessage(
+            {
+              type: "IFRAME_READY",
+            },
+            "https://akash2802.github.io"
+          );
         }
+        initializeForm();
+        setupTabs();
 
-        // Setup create button
-        const createBtn = document.getElementById("create-button");
-        if (createBtn) {
-          createBtn.addEventListener("click", function () {
+        // Set up create button handler
+        document
+          .getElementById("create-button")
+          .addEventListener("click", function () {
             updateMetaData();
-            console.log("📤 Sending updateMetaInfo:", metaData);
-            window.parent.postMessage({
-              type: "updateMetaInfo",
-              payload: metaData
-            }, TARGET_ORIGIN);
+
+            // Here you would typically send the data back to the plugin
+            console.log("Updated meta data:", metaData);
+         
+
+            // If running in an iframe, send to parent
+            if (window.parent) {
+              window.parent.postMessage(
+                {
+                  type: "updateMetaInfo",
+                  payload: metaData,
+                },
+                "*"
+              );
+            }
+               window.parent.postMessage(
+        {
+          type: "CLOSE_DIALOG", // Make sure parent listens for this type
+        },
+        "*"
+      );
           });
-        }
       });
 
       // Initialize the form with the meta data
