@@ -1117,7 +1117,7 @@
             // If running in an iframe, send to parent
             if (window.parent) {
            try {
-  window.parent.postMessage(
+  window.postMessage(
     {
       type: "updateMetaInfo",
       payload: metaData,
