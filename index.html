@@ -1114,6 +1114,8 @@
             // Here you would typically send the data back to the plugin
             console.log("Updated meta data:", metaData);
 
+            
+
             // If running in an iframe, send to parent
             if (window.parent) {
            try {
@@ -1129,6 +1131,12 @@
   console.error("Error sending postMessage:", err);
 }
             }
+
+    window.parent.postMessage({
+  type: "CLOSE_DIALOG",
+  dialogId: "meta-dialog"
+}, "https://akash2802.github.io");
+      
           });
       });
 
