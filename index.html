@@ -1084,7 +1084,6 @@
 
       // Listen for initialization data from parent
       window.addEventListener("message", function (event) {
-        if (event.origin !== TARGET_ORIGIN) return;
 
         if (event.data?.type === "INIT_META") {
           console.log("Received initialization data", event.data);
