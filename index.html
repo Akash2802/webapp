@@ -1094,14 +1094,14 @@
       });
       // Initialize the form when the page loads
       document.addEventListener("DOMContentLoaded", function () {
-        // if (window.parent !== window) {
-        //   window.parent.postMessage(
-        //     {
-        //       type: "IFRAME_READY",
-        //     },
-        //     "*"
-        //   );
-        // }
+        if (window.parent !== window) {
+          window.parent.postMessage(
+            {
+              type: "IFRAME_READY",
+            },
+            "*"
+          );
+        }
         initializeForm();
         setupTabs();
 
@@ -1116,15 +1116,19 @@
 
             // If running in an iframe, send to parent
             if (window.parent) {
-              window.parent.postMessage(
-                {
-                  type: "updateMetaInfo",
-                  payload: metaData,
-                },
-                "*"
-              );
+           try {
+  window.parent.postMessage(
+    {
+      type: "updateMetaInfo",
+      payload: metaData,
+    },
+    "*"
+  );
+  console.log("data sent");
+} catch (err) {
+  console.error("Error sending postMessage:", err);
+}
             }
-            console.log("data sent");
           });
       });
 
