@@ -1123,6 +1123,7 @@
     {
       type: "updateMetaInfo",
       payload: metaData,
+      dialogId: "meta-dialog"
     },
     "*"
   );
@@ -1132,10 +1133,10 @@
 }
             }
 
-    window.parent.postMessage({
-  type: "CLOSE_DIALOG",
-  dialogId: "meta-dialog"
-}, "https://akash2802.github.io");
+//     window.parent.postMessage({
+//   type: "CLOSE_DIALOG",
+//   dialogId: "meta-dialog"
+// }, "https://akash2802.github.io");
       
           });
       });
