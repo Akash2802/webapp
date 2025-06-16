@@ -1083,25 +1083,25 @@
       const TARGET_ORIGIN = "https://akash2802.github.io";
 
       // Listen for initialization data from parent
-      // window.addEventListener("message", function (event) {
+      window.addEventListener("message", function (event) {
 
-      //   if (event.data?.type === "INIT_META") {
-      //     console.log("Received initialization data", event.data);
-      //     metaData = event.data.payload;
-      //     initializeForm();
-      //     setupTabs();
-      //   }
-      // });
+        if (event.data?.type === "INIT_META") {
+          console.log("Received initialization data", event.data);
+          metaData = event.data.payload;
+          initializeForm();
+          setupTabs();
+        }
+      });
       // Initialize the form when the page loads
       document.addEventListener("DOMContentLoaded", function () {
-        // if (window.parent !== window) {
-        //   window.parent.postMessage(
-        //     {
-        //       type: "IFRAME_READY",
-        //     },
-        //     "*"
-        //   );
-        // }
+        if (window.parent !== window) {
+          window.parent.postMessage(
+            {
+              type: "IFRAME_READY",
+            },
+            "*"
+          );
+        }
         initializeForm();
         setupTabs();
 
